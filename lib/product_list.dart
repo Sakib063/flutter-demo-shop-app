@@ -13,11 +13,38 @@ class ProductList extends StatefulWidget {
 class _ProductListState extends State<ProductList> {
   final List<String> filters = const ["All", "Adidas", "Nike", "Bata"];
   late String selected_filter;
+  late List<Map<String,Object>> filtered_products;
+  TextEditingController _search_controller=TextEditingController();
+  String search_query="";
 
   @override
   void initState() {
     super.initState();
     selected_filter = filters[0];
+    filtered_products=products;
+
+    _search_controller.addListener((){
+      setState(() {
+        search_query=_search_controller.text.toLowerCase();
+        filter_products(selected_filter,search_query);
+      });
+    });
+  }
+
+  void filter_products(String company,String query){
+    setState(() {
+      List<Map<String,Object>> temp_products=products;
+      if(company!="All"){
+        temp_products=products.where((products){
+          return products['company']==company;
+        }).toList();
+      }
+
+      filtered_products=temp_products.where((products){
+        final title=products['title'] as String;
+        return title.toLowerCase().contains(query);
+      }).toList();
+    });
   }
 
   @override
@@ -37,6 +64,7 @@ class _ProductListState extends State<ProductList> {
               SizedBox(
                 width: 240,
                 child: TextField(
+                  controller: _search_controller,
                   decoration: const InputDecoration(hintText: "Search", prefixIcon: Icon(Icons.search), border: OutlineInputBorder(borderSide: BorderSide(color: Colors.white))),
                 ),
               ),
@@ -55,6 +83,7 @@ class _ProductListState extends State<ProductList> {
                     onTap: () {
                       setState(() {
                         selected_filter = filter;
+                        filter_products(filter,search_query);
                       });
                     },
                     child: Chip(
@@ -72,9 +101,9 @@ class _ProductListState extends State<ProductList> {
           ),
           Expanded(
             child: ListView.builder(
-                itemCount: products.length,
+                itemCount: filtered_products.length,
                 itemBuilder: (context,index){
-                  final product=products[index];
+                  final product=filtered_products[index];
                   return GestureDetector(
                     onTap: (){
                       Navigator.of(context).push(MaterialPageRoute(
