@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shop/global_variables.dart';
-import 'package:shop/product_card.dart';
-import 'package:shop/product_detail_page.dart';
+import 'package:shop/localization/demo_localization.dart';
+import 'package:shop/widgets/product_card.dart';
+import 'package:shop/pages/product_detail_page.dart';
 
 class ProductList extends StatefulWidget {
   const ProductList({super.key});
@@ -11,7 +12,14 @@ class ProductList extends StatefulWidget {
 }
 
 class _ProductListState extends State<ProductList> {
-  final List<String> filters = const ["All", "Adidas", "Nike", "Bata"];
+  List<String> localized_filters(BuildContext context){
+    return[
+      DemoLocalization.of(context)?.translated_value('all')??"All",
+      DemoLocalization.of(context)?.translated_value('adidas')??"Adidas",
+      DemoLocalization.of(context)?.translated_value('nike')??"Nike",
+      DemoLocalization.of(context)?.translated_value('bata')??"Bata",
+    ];
+  }
   late String selected_filter;
   late List<Map<String,Object>> filtered_products;
   TextEditingController _search_controller=TextEditingController();
@@ -20,7 +28,7 @@ class _ProductListState extends State<ProductList> {
   @override
   void initState() {
     super.initState();
-    selected_filter = filters[0];
+    selected_filter="All";
     filtered_products=products;
 
     _search_controller.addListener((){
@@ -49,6 +57,8 @@ class _ProductListState extends State<ProductList> {
 
   @override
   Widget build(BuildContext context) {
+    List<String> filters=localized_filters(context);
+
     return SafeArea(
       child: Column(
         children: [
@@ -57,15 +67,23 @@ class _ProductListState extends State<ProductList> {
               Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Text(
-                  'Shoes\nCollection',
+                  DemoLocalization.of(context)?.translated_value('shoes_collection')??"Shoes\nCollection",
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
               ),
-              SizedBox(
-                width: 240,
-                child: TextField(
-                  controller: _search_controller,
-                  decoration: const InputDecoration(hintText: "Search", prefixIcon: Icon(Icons.search), border: OutlineInputBorder(borderSide: BorderSide(color: Colors.white))),
+              Flexible(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: TextField(
+                    controller: _search_controller,
+                    decoration: InputDecoration(
+                      hintText: DemoLocalization.of(context)?.translated_value('search'),
+                      prefixIcon: const Icon(Icons.search),
+                      border: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ],

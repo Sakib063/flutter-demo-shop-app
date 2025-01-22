@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shop/cart_provider.dart';
+import 'package:shop/localization/demo_localization.dart';
+import 'package:shop/providers/cart_provider.dart';
 
 class ProductDetailPage extends StatefulWidget{
   final Map<String,Object> product;
@@ -15,12 +16,13 @@ class ProductDetailPage extends StatefulWidget{
 
 class _ProductDetailPageState extends State<ProductDetailPage> {
   int selected_size=0;
+  bool _addedToCart=false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Details"),
+        title: Text(DemoLocalization.of(context)?.translated_value('details')??"Details"),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -58,6 +60,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           onTap: (){
                             setState(() {
                               selected_size=size;
+                              _addedToCart=false;
                             });
                           },
                           child: Chip(
@@ -73,9 +76,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton.icon(
-                    icon: Icon(
-                      Icons.shopping_cart,
-                      color: Colors.black,
+                    icon: AnimatedSwitcher(
+                      duration: Duration(milliseconds: 300),
+                      child:_addedToCart ?Icon(Icons.check,color:Colors.white,key:ValueKey('tick')):Icon(Icons.shopping_cart,color:Colors.black,key:ValueKey('cart')),
                     ),
                     onPressed: (){
                       if(selected_size!=0){
@@ -88,18 +91,27 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                               'size':selected_size,
                             }
                         );
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Added Successfully')));
+                        setState(() {
+                          _addedToCart=true;
+                        });
                       }
                       else{
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please Select Size')));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content:
+                            Text(DemoLocalization.of(context)?.translated_value('size_select_message')??"Please Select Size"),
+                            behavior: SnackBarBehavior.floating,
+                            showCloseIcon: true,
+                          ),
+                        );
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).primaryColor,
+                      backgroundColor: _addedToCart?Colors.green:Theme.of(context).primaryColor,
                       minimumSize: const Size(double.infinity, 50),
                     ),
                     label: Text(
-                      'Add To Card',
+                      _addedToCart? DemoLocalization.of(context)?.translated_value('added')??'Added'
+                          :DemoLocalization.of(context)?.translated_value('add_to_cart')??'Add To Cart',
                       style: TextStyle(
                         color: Colors.black,
                       ),

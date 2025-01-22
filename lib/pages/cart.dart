@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shop/cart_provider.dart';
+import 'package:shop/localization/demo_localization.dart';
+import 'package:shop/providers/cart_provider.dart';
 
 class Cart extends StatelessWidget {
   const Cart({super.key});
@@ -30,21 +31,27 @@ class Cart extends StatelessWidget {
                   context: context, 
                   builder: (context){
                     return AlertDialog(
-                      title:Text('Delete Product'),
-                      content:Text("Are you sure you want to delete?"),
+                      title:Text(DemoLocalization.of(context)?.translated_value('delete_product')??"Delete Product"),
+                      content:Text(DemoLocalization.of(context)?.translated_value('warning')??"Are you sure you want to delete?"),
                       actions:[
                         TextButton(
                             onPressed: (){
                               Navigator.of(context).pop();
                             }, 
-                            child:const Text('No',style:TextStyle(color:Colors.green)),
+                            child: Text(
+                              DemoLocalization.of(context)?.translated_value('no')??"No",
+                              style:TextStyle(color:Colors.green),
+                            ),
                         ),
                         TextButton(
                           onPressed: (){
                             context.read<CartProvider>().remove_product(cart_item);
                             Navigator.of(context).pop();
                           },
-                          child:const Text('Yes',style:TextStyle(color:Colors.red)),
+                          child: Text(
+                            DemoLocalization.of(context)?.translated_value('yes')??"Yes",
+                            style:TextStyle(color:Colors.red),
+                          ),
                         )
                       ],
                     );
